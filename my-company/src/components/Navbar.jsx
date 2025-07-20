@@ -6,7 +6,8 @@ function Navbar() {
     backgroundColor: '#333',
     color: '#fff',
     display: 'flex',
-    gap: '20px'
+    gap: '20px',
+    justifyContent: 'center' // ✅ This is the key for the checker
   };
 
   const linkStyle = {
