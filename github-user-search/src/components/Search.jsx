@@ -19,7 +19,7 @@ const Search = () => {
       const userData = await fetchUserData(query);
       setUsers([userData]); // wrap in array to match advanced format
     } catch (err) {
-      setError("User not found or error occurred.");
+      setError("Looks like we cant find the user");
       setUsers([]);
     }
     setLoading(false);
