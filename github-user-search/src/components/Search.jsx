@@ -1,174 +1,120 @@
-// src/components/Search.jsx
-import { useState } from "react";
-import { searchUsers } from "../api";
+import React, { useState } from "react";
+import { fetchUserData, searchUsers } from "../services/githubService";
 
-function Search() {
-  const [searchTerm, setSearchTerm] = useState("");
+const Search = () => {
+  const [query, setQuery] = useState("");
   const [location, setLocation] = useState("");
   const [minRepos, setMinRepos] = useState("");
-  const [userData, setUserData] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleBasicSearch = async (e) => {
     e.preventDefault();
-    if (!searchTerm.trim()) return;
+    if (!query.trim()) return;
 
     setLoading(true);
-    setError(null);
-
+    setError("");
     try {
-      const users = await searchUsers({
-        query: searchTerm,
-        location,
-        minRepos,
-      });
-      setUserData(users);
+      const userData = await fetchUserData(query);
+      setUsers([userData]); // wrap in array to match advanced format
     } catch (err) {
-      setError("Failed to fetch users. Please try again.");
-    } finally {
-      setLoading(false);
+      setError("User not found or error occurred.");
+      setUsers([]);
     }
+    setLoading(false);
   };
 
-  const inputStyle = {
-    width: "250px",
-    height: "45px",
-    textAlign: "center",
-    fontSize: "16px",
-    margin: "5px auto",
-    padding: "8px",
-    border: "2px solid #ddd",
-    borderRadius: "6px",
-  };
+  const handleAdvancedSearch = async (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
 
-  const formStyle = {
-    padding: "20px",
-    borderRadius: "10px",
-    marginBottom: "20px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+    setLoading(true);
+    setError("");
+    try {
+      const results = await searchUsers({ query, location, minRepos });
+      setUsers(results);
+    } catch (err) {
+      setError("Advanced search failed.");
+      setUsers([]);
+    }
+    setLoading(false);
   };
 
   return (
-    <div>
-      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
-        GitHub Advanced User Search
-      </h1>
-
-      <form onSubmit={handleSubmit} style={formStyle}>
+    <div className="max-w-2xl mx-auto p-4">
+      <form
+        onSubmit={
+          location || minRepos ? handleAdvancedSearch : handleBasicSearch
+        }
+        className="space-y-4"
+      >
         <input
           type="text"
-          placeholder="Enter GitHub username..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={inputStyle}
-          required
+          placeholder="Enter GitHub username"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full p-2 border rounded"
         />
-        <input
-          type="text"
-          placeholder="Location (optional)"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          style={inputStyle}
-        />
-        <input
-          type="number"
-          placeholder="Minimum public repos"
-          value={minRepos}
-          onChange={(e) => setMinRepos(e.target.value)}
-          style={inputStyle}
-          min="0"
-        />
-
+        <div className="flex flex-col md:flex-row gap-4">
+          <input
+            type="text"
+            placeholder="Location (optional)"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="number"
+            placeholder="Min Repos (optional)"
+            value={minRepos}
+            onChange={(e) => setMinRepos(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
+        </div>
         <button
           type="submit"
-          disabled={loading}
-          style={{
-            marginTop: "10px",
-            padding: "10px 20px",
-            fontSize: "16px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "bold",
-          }}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          {loading ? "Searching..." : "Search"}
+          {location || minRepos ? "Advanced Search" : "Basic Search"}
         </button>
       </form>
 
-      {error && (
-        <div
-          style={{
-            backgroundColor: "#f8d7da",
-            color: "#721c24",
-            padding: "15px",
-            margin: "20px auto",
-            width: "80%",
-            borderRadius: "6px",
-            textAlign: "center",
-          }}
-        >
-          {error}
-        </div>
-      )}
+      {loading && <p className="mt-4 text-yellow-500">Loading...</p>}
+      {error && <p className="mt-4 text-red-500">{error}</p>}
 
-      {/* Results */}
-      <div
-        style={{
-          display: "grid",
-          gap: "20px",
-          padding: "20px",
-        }}
-      >
-        {userData.map((user) => (
+      <div className="mt-6 space-y-4">
+        {users.map((user) => (
           <div
             key={user.id}
-            style={{
-              backgroundColor: "#fff",
-              padding: "20px",
-              borderRadius: "10px",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-              display: "flex",
-              alignItems: "center",
-              gap: "20px",
-            }}
+            className="p-4 border rounded flex items-center gap-4"
           >
             <img
               src={user.avatar_url}
               alt={user.login}
-              style={{
-                width: "80px",
-                height: "80px",
-                borderRadius: "50%",
-                border: "2px solid #eee",
-              }}
+              className="w-16 h-16 rounded-full"
             />
             <div>
-              <h3 style={{ margin: 0 }}>@{user.login}</h3>
               <a
                 href={user.html_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  color: "#007bff",
-                  textDecoration: "none",
-                  fontWeight: "bold",
-                }}
+                className="text-blue-600 hover:underline"
               >
-                View Profile →
+                {user.login}
               </a>
+              {user.location && (
+                <p className="text-gray-600">{user.location}</p>
+              )}
+              {user.public_repos !== undefined && (
+                <p className="text-gray-600">Repos: {user.public_repos}</p>
+              )}
             </div>
           </div>
         ))}
       </div>
     </div>
   );
-}
+};
 
 export default Search;
