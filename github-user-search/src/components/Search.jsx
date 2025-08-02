@@ -1,4 +1,6 @@
+// src/components/Search.jsx
 import { useState } from "react";
+import { searchUsers } from "../api";
 
 function Search() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -8,10 +10,6 @@ function Search() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleInputChange = (e) => setSearchTerm(e.target.value);
-  const handleLocationChange = (e) => setLocation(e.target.value);
-  const handleMinReposChange = (e) => setMinRepos(e.target.value);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
@@ -20,24 +18,12 @@ function Search() {
     setError(null);
 
     try {
-      let query = `${searchTerm}`;
-      if (minRepos.trim()) query += ` repos:>${minRepos}`;
-      if (location.trim()) query += ` location:${location}`;
-
-      const url = `https://api.github.com/search/users?q=${encodeURIComponent(
-        query
-      )}`;
-
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `token ${import.meta.env.VITE_APP_GITHUB_API_KEY}`,
-        },
+      const users = await searchUsers({
+        query: searchTerm,
+        location,
+        minRepos,
       });
-
-      if (!response.ok) throw new Error("Failed to fetch");
-
-      const result = await response.json();
-      setUserData(result.items || []);
+      setUserData(users);
     } catch (err) {
       setError("Failed to fetch users. Please try again.");
     } finally {
@@ -45,13 +31,12 @@ function Search() {
     }
   };
 
-  const inputStyling = {
+  const inputStyle = {
     width: "250px",
     height: "45px",
     textAlign: "center",
-    fontFamily: "sans-serif",
     fontSize: "16px",
-    margin: "5px",
+    margin: "5px auto",
     padding: "8px",
     border: "2px solid #ddd",
     borderRadius: "6px",
@@ -61,7 +46,10 @@ function Search() {
     padding: "20px",
     borderRadius: "10px",
     marginBottom: "20px",
-    boxShadow: "0 2px 10px rgba(231, 229, 229, 0.1)",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   };
 
   return (
@@ -71,59 +59,48 @@ function Search() {
       </h1>
 
       <form onSubmit={handleSubmit} style={formStyle}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={handleInputChange}
-            placeholder="Enter GitHub username..."
-            style={inputStyling}
-            required
-          />
+        <input
+          type="text"
+          placeholder="Enter GitHub username..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={inputStyle}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Location (optional)"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          style={inputStyle}
+        />
+        <input
+          type="number"
+          placeholder="Minimum public repos"
+          value={minRepos}
+          onChange={(e) => setMinRepos(e.target.value)}
+          style={inputStyle}
+          min="0"
+        />
 
-          <input
-            type="text"
-            value={location}
-            onChange={handleLocationChange}
-            placeholder="e.g., New York, London, Tokyo..."
-            style={inputStyling}
-          />
-
-          <input
-            type="number"
-            value={minRepos}
-            onChange={handleMinReposChange}
-            placeholder="Minimum public repos"
-            style={inputStyling}
-            min="0"
-          />
-
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              height: "50px",
-              fontSize: "18px",
-              backgroundColor: "#007bff",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              marginTop: "10px",
-              fontWeight: "bold",
-            }}
-            disabled={loading}
-          >
-            {loading ? "Searching..." : "Search"}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            marginTop: "10px",
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
+        >
+          {loading ? "Searching..." : "Search"}
+        </button>
       </form>
-
-      {loading && (
-        <div style={{ textAlign: "center", padding: "20px" }}>
-          <h2 style={{ color: "#007bff" }}>Loading...</h2>
-        </div>
-      )}
 
       {error && (
         <div
@@ -131,22 +108,29 @@ function Search() {
             backgroundColor: "#f8d7da",
             color: "#721c24",
             padding: "15px",
+            margin: "20px auto",
+            width: "80%",
             borderRadius: "6px",
-            marginBottom: "20px",
-            border: "1px solid #f5c6cb",
+            textAlign: "center",
           }}
         >
-          <h2>Error: {error}</h2>
+          {error}
         </div>
       )}
 
       {/* Results */}
-      <div style={{ display: "grid", gap: "20px" }}>
+      <div
+        style={{
+          display: "grid",
+          gap: "20px",
+          padding: "20px",
+        }}
+      >
         {userData.map((user) => (
           <div
             key={user.id}
             style={{
-              backgroundColor: "white",
+              backgroundColor: "#fff",
               padding: "20px",
               borderRadius: "10px",
               boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
@@ -157,16 +141,16 @@ function Search() {
           >
             <img
               src={user.avatar_url}
-              alt={`${user.login}'s avatar`}
+              alt={user.login}
               style={{
-                width: "100px",
-                height: "100px",
+                width: "80px",
+                height: "80px",
                 borderRadius: "50%",
-                border: "3px solid #ddd",
+                border: "2px solid #eee",
               }}
             />
             <div>
-              <h3>@{user.login}</h3>
+              <h3 style={{ margin: 0 }}>@{user.login}</h3>
               <a
                 href={user.html_url}
                 target="_blank"
