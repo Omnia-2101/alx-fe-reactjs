@@ -25,7 +25,7 @@ export default function Search() {
       setLocation('');
       setMinRepos('');
     } catch (err) {
-      setError('Looks like we can’t find the user');
+      setError('Looks like we cant find the user');
     } finally {
       setLoading(false);
     }
