@@ -1,11 +1,25 @@
-import Search from './components/Search';
+import { BrowserRouter, Routes, Route, useParams, Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import './App.css'
+import apiData from './services/githubService'
+import Greeting from './components/Greeting'
+import Search from './components/Search'
+
 
 function App() {
+
+
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center overflow-y-auto bg-[#2c3e50] p-6">
-      <Search />
-    </div>
-  );
+    <BrowserRouter>
+        <h1>Hello world</h1>
+        <Greeting />
+        <Search />
+        <Routes>
+          {/* <Route path='' element={}/> */}
+        </Routes>
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App
