@@ -1,17 +1,18 @@
 [
   {
     "id": 1,
-    "title": "Spaghetti Bolognese",
-    "summary": "A classic Italian pasta dish with rich meat sauce.",
-    "image": "https://images.unsplash.com/photo-1603133872878-684f9b5e7d4a",
-    "ingredients": [
-      "200g spaghetti",
-      "2 tbsp olive oil",
-      "1 onion, chopped",
-      "2 garlic cloves, minced",
-      "400g ground beef",
-      "1 can chopped tomatoes",
-      "2 tbsp tomato paste",
-      "1 tsp dried oregano",
-      "Salt and pepper to taste",
-      "Fresh basil for garnish
+    "title": "Spaghetti Carbonara",
+    "summary": "A classic Italian pasta dish with eggs, cheese, bacon, and black pepper.",
+    "image": "https://via.placeholder.com/300x200",
+    "ingredients": ["200g spaghetti", "2 eggs", "100g bacon", "50g parmesan", "Black pepper"],
+    "instructions": "Cook pasta. Fry bacon. Mix eggs and cheese. Combine all with pasta. Season with pepper."
+  },
+  {
+    "id": 2,
+    "title": "Chicken Tikka Masala",
+    "summary": "Chunks of grilled chicken cooked in a buttery, spiced tomato sauce.",
+    "image": "https://via.placeholder.com/300x200",
+    "ingredients": ["500g chicken", "200ml cream", "2 onions", "Spices", "Tomato paste"],
+    "instructions": "Grill chicken. Cook onion and spices. Add tomato paste and cream. Mix chicken in sauce."
+  }
+]
