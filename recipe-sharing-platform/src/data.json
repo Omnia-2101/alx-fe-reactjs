@@ -1,14 +1,17 @@
 [
   {
     "id": 1,
-    "title": "Spaghetti Carbonara",
-    "summary": "A classic Italian pasta dish with creamy sauce.",
-    "image": "https://via.placeholder.com/150"
-  },
-  {
-    "id": 2,
-    "title": "Chicken Curry",
-    "summary": "Spicy and savory curry with tender chicken pieces.",
-    "image": "https://via.placeholder.com/150"
-  }
-]
+    "title": "Spaghetti Bolognese",
+    "summary": "A classic Italian pasta dish with rich meat sauce.",
+    "image": "https://images.unsplash.com/photo-1603133872878-684f9b5e7d4a",
+    "ingredients": [
+      "200g spaghetti",
+      "2 tbsp olive oil",
+      "1 onion, chopped",
+      "2 garlic cloves, minced",
+      "400g ground beef",
+      "1 can chopped tomatoes",
+      "2 tbsp tomato paste",
+      "1 tsp dried oregano",
+      "Salt and pepper to taste",
+      "Fresh basil for garnish
